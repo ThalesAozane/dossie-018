@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convite — Caso Nº 018</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cork: #5c4530;
+    --cork-dark: #4a3625;
+    --paper: #efe3c8;
+    --paper-shadow: rgba(20,12,4,0.35);
+    --ink: #241c12;
+    --red: #a8382b;
+    --red-dark: #7c281e;
+    --pin: #d6c9a8;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    min-height: 100%;
+    font-family: 'Courier Prime', monospace;
+    color: var(--ink);
+    background:
+      radial-gradient(ellipse at 20% 15%, rgba(0,0,0,0.15), transparent 55%),
+      radial-gradient(ellipse at 80% 85%, rgba(0,0,0,0.2), transparent 55%),
+      repeating-radial-gradient(circle at 30% 40%, rgba(0,0,0,0.05) 0, rgba(0,0,0,0.05) 1px, transparent 2px, transparent 6px),
+      var(--cork);
+    background-blend-mode: multiply, multiply, normal, normal;
+    overflow-x: hidden;
+  }
+
+  .stage{
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 56px 16px 80px;
+  }
+
+  .board{
+    width: min(680px, 96vw);
+    position: relative;
+  }
+
+  /* ---------- INTRO HEADER ---------- */
+  .intro{
+    text-align: center;
+    color: var(--paper);
+    margin-bottom: 46px;
+  }
+
+  .case-no{
+    font-family: 'Special Elite', cursive;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(239,227,200,0.65);
+    margin-bottom: 14px;
+  }
+
+  .intro h1{
+    font-family: 'Special Elite', cursive;
+    font-size: clamp(26px, 6vw, 38px);
+    line-height: 1.35;
+    margin: 0 0 8px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+
+  .intro h1 .name{
+    color: var(--red);
+  }
+
+  .intro p{
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 44ch;
+    margin: 0 auto;
+    color: rgba(239,227,200,0.8);
+  }
+
+  .open-btn{
+    margin-top: 26px;
+    font-family: 'Special Elite', cursive;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: var(--red);
+    color: var(--paper);
+    border: none;
+    padding: 12px 26px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+    transition: transform 0.15s ease, background 0.2s ease;
+  }
+  .open-btn:hover{ background: var(--red-dark); }
+  .open-btn:active{ transform: scale(0.96); }
+  .open-btn.hidden{ display: none; }
+
+  /* ---------- STRING SVG LAYER ---------- */
+  .string-layer{
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .string-layer path{
+    fill: none;
+    stroke: var(--red);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 900;
+    stroke-dashoffset: 900;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+    transition: stroke-dashoffset 1s ease 0.4s;
+  }
+
+  .board.open .string-layer path{
+    stroke-dashoffset: 0;
+  }
+
+  /* ---------- CARDS ---------- */
+  .cards{
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .card{
+    background: var(--paper);
+    box-shadow: 0 16px 30px var(--paper-shadow);
+    padding: 26px 26px 24px;
+    position: relative;
+    opacity: 0;
+    transform: translateY(30px) rotate(var(--rot));
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(.2,.8,.2,1);
+  }
+
+  .board.open .card{
+    opacity: 1;
+    transform: translateY(0) rotate(var(--rot));
+  }
+
+  .card.a{ --rot: -2.2deg; align-self: flex-start; width: 84%; transition-delay: 0.6s; }
+  .card.b{ --rot: 1.6deg; align-self: flex-end; width: 84%; transition-delay: 1.0s; }
+
+  .pin{
+    position: absolute;
+    top: -11px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #e8534a, var(--red-dark) 70%);
+    box-shadow: 0 3px 5px rgba(0,0,0,0.45);
+    z-index: 3;
+  }
+
+  .tag{
+    font-family: 'Special Elite', cursive;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 10px;
+  }
+
+  .card h2{
+    font-family: 'Special Elite', cursive;
+    font-size: 22px;
+    margin: 0 0 12px;
+    line-height: 1.3;
+  }
+
+  .card p{
+    font-size: 14.5px;
+    line-height: 1.7;
+    margin: 0 0 14px;
+    color: rgba(36,28,18,0.85);
+  }
+
+  .meta-list{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px dashed rgba(36,28,18,0.3);
+    padding-top: 12px;
+  }
+
+  .meta-row{
+    display: flex;
+    gap: 10px;
+    font-size: 13.5px;
+  }
+
+  .meta-row .k{
+    font-weight: 700;
+    min-width: 62px;
+  }
+
+  .stamp-small{
+    position: absolute;
+    bottom: 14px;
+    right: 18px;
+    font-family: 'Special Elite', cursive;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(168,56,43,0.55);
+    border: 1.5px solid rgba(168,56,43,0.55);
+    padding: 3px 8px;
+    transform: rotate(-6deg);
+  }
+
+  /* ---------- FINAL ACCEPT ---------- */
+  .accept-wrap{
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    margin-top: 46px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease 1.4s, transform 0.6s ease 1.4s;
+  }
+  .board.open .accept-wrap{ opacity: 1; transform: translateY(0); }
+
+  .accept-wrap p{
+    color: rgba(239,227,200,0.85);
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+
+  .accept-btn{
+    font-family: 'Special Elite', cursive;
+    font-size: 15px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--paper);
+    border: 2px solid var(--paper);
+    padding: 13px 30px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  }
+  .accept-btn:hover{ background: var(--paper); color: var(--ink); }
+  .accept-btn:active{ transform: scale(0.96); }
+
+  .accepted-stamp{
+    display: inline-block;
+    margin-top: 18px;
+    font-family: 'Special Elite', cursive;
+    font-size: 22px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--red);
+    border: 3px solid var(--red);
+    padding: 8px 22px;
+    transform: rotate(-5deg) scale(0);
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(.34,1.56,.64,1), opacity 0.3s ease;
+  }
+  .accepted-stamp.show{
+    transform: rotate(-5deg) scale(1);
+    opacity: 0.95;
+  }
+
+  @media (max-width: 560px){
+    .card.a, .card.b{ width: 100%; align-self: center; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .card, .string-layer path, .accept-wrap, .accepted-stamp{ transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="board" id="board">
+
+    <div class="intro">
+      <div class="case-no">Caso Nº 018 · Confidencial</div>
+      <h1>Nicoly, você está sendo<br>convocada para um caso.</h1>
+      <p>18/07, na minha casa. Os detalhes da noite estão anexados a seguir — abra o dossiê quando estiver pronta.</p>
+      <button class="open-btn" id="openBtn">Abrir dossiê</button>
+    </div>
+
+    <svg class="string-layer" id="stringLayer" viewBox="0 0 680 480" preserveAspectRatio="none">
+      <path id="stringPath" d="M 120 150 C 260 210, 420 260, 560 320" />
+    </svg>
+
+    <div class="cards">
+      <div class="card a">
+        <div class="pin"></div>
+        <div class="tag">Prova A</div>
+        <h2>O Jantar</h2>
+        <p>Massa ao molho de queijo, feita em casa e por mim. E durante o preparo do jantar, irei fazer o seu audiobook ao vivo.</p>
+        <div class="meta-list">
+          <div class="meta-row"><span class="k">Data:</span><span>18/07</span></div>
+          <div class="meta-row"><span class="k">Hora:</span><span>[Horário a combinar]</span></div>
+          <div class="meta-row"><span class="k">Local:</span><span>Minha casa</span></div>
+        </div>
+        <div class="stamp-small">Evidência 01</div>
+      </div>
+
+      <div class="card b">
+        <div class="pin"></div>
+        <div class="tag">Prova B</div>
+        <h2>A Missão</h2>
+        <p>Depois da janta, a mesa vai virar nossa sala de investigação, então venha preparada com sua experiência em séries criminais.</p>
+        <div class="meta-list">
+          <div class="meta-row"><span class="k">Formato:</span><span>Jogo de investigação</span></div>
+          <div class="meta-row"><span class="k">Duração:</span><span>[a definir]</span></div>
+        </div>
+        <div class="stamp-small">Evidência 02</div>
+      </div>
+    </div>
+
+    <div class="accept-wrap">
+      <p>Aceita o caso?</p>
+      <button class="accept-btn" id="acceptBtn">Aceitar a missão</button>
+      <div class="accepted-stamp" id="acceptedStamp">Aceito</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const board = document.getElementById('board');
+  const openBtn = document.getElementById('openBtn');
+  const acceptBtn = document.getElementById('acceptBtn');
+  const acceptedStamp = document.getElementById('acceptedStamp');
+
+  openBtn.addEventListener('click', () => {
+    board.classList.add('open');
+    openBtn.classList.add('hidden');
+  });
+
+  acceptBtn.addEventListener('click', () => {
+    acceptedStamp.classList.add('show');
+    acceptBtn.disabled = true;
+    acceptBtn.style.opacity = '0.5';
+  });
+</script>
+
+</body>
+</html>
